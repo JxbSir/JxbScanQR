@@ -35,6 +35,7 @@
 @interface QRCodeReaderViewController () <AVCaptureMetadataOutputObjectsDelegate,QRCodeReaderViewDelegate>
 @property (strong, nonatomic) QRCameraSwitchButton *switchCameraButton;
 @property (strong, nonatomic) QRCodeReaderView     *cameraView;
+@property (strong, nonatomic) AVAudioPlayer        *beepPlayer;
 @property (strong, nonatomic) UIButton             *cancelButton;
 @property (strong, nonatomic) UIImageView          *imgLine;
 @property (strong, nonatomic) UILabel              *lblTip;
@@ -56,6 +57,10 @@
 
 - (id)init
 {
+    NSString * wavPath = [[NSBundle mainBundle] pathForResource:@"beep" ofType:@"wav"];
+    NSData* data = [[NSData alloc] initWithContentsOfFile:wavPath];
+    _beepPlayer = [[AVAudioPlayer alloc] initWithData:data error:nil];
+    
     return [self initWithCancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")];
 }
 
@@ -155,7 +160,7 @@
 
 - (void)setCompletionWithBlock:(void (^) (NSString *resultAsString))completionBlock
 {
-  self.completionBlock = completionBlock;
+    self.completionBlock = completionBlock;
 }
 
 #pragma mark - Initializing the AV Components
@@ -350,22 +355,26 @@
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection *)connection
 {
-  for(AVMetadataObject *current in metadataObjects) {
-    if ([current isKindOfClass:[AVMetadataMachineReadableCodeObject class]]
-        && [current.type isEqualToString:AVMetadataObjectTypeQRCode]) {
-      NSString *scannedResult = [(AVMetadataMachineReadableCodeObject *) current stringValue];
-      
-      if (_completionBlock) {
-        _completionBlock(scannedResult);
-      }
-      
-      if (_delegate && [_delegate respondsToSelector:@selector(reader:didScanResult:)]) {
-        [_delegate reader:self didScanResult:scannedResult];
-      }
-      
-      break;
+    for(AVMetadataObject *current in metadataObjects) {
+        if ([current isKindOfClass:[AVMetadataMachineReadableCodeObject class]]
+            && [current.type isEqualToString:AVMetadataObjectTypeQRCode])
+        {
+            NSString *scannedResult = [(AVMetadataMachineReadableCodeObject *) current stringValue];
+
+            [self stopScanning];
+
+            if (_completionBlock) {
+                [_beepPlayer play];
+                _completionBlock(scannedResult);
+            }
+
+            if (_delegate && [_delegate respondsToSelector:@selector(reader:didScanResult:)]) {
+                [_delegate reader:self didScanResult:scannedResult];
+            }
+
+            break;
+        }
     }
-  }
 }
 
 #pragma mark - Checking the Metadata Items Types

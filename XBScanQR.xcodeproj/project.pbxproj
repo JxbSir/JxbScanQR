@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D03179EB1ACD3D350095D309 /* beep.wav in Resources */ = {isa = PBXBuildFile; fileRef = D03179EA1ACD3D350095D309 /* beep.wav */; };
 		D0CAD9C11AA8008C00D6605B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9C01AA8008C00D6605B /* main.m */; };
 		D0CAD9C41AA8008C00D6605B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9C31AA8008C00D6605B /* AppDelegate.m */; };
 		D0CAD9C71AA8008C00D6605B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9C61AA8008C00D6605B /* ViewController.m */; };
@@ -30,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D03179EA1ACD3D350095D309 /* beep.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = beep.wav; sourceTree = "<group>"; };
 		D0CAD9BB1AA8008C00D6605B /* XBScanQR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBScanQR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CAD9BF1AA8008C00D6605B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D0CAD9C01AA8008C00D6605B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 		D0CAD9BE1AA8008C00D6605B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D03179EA1ACD3D350095D309 /* beep.wav */,
 				D0CAD9BF1AA8008C00D6605B /* Info.plist */,
 				D0CAD9C01AA8008C00D6605B /* main.m */,
 			);
@@ -224,6 +227,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D03179EB1ACD3D350095D309 /* beep.wav in Resources */,
 				D0CAD9CA1AA8008C00D6605B /* Main.storyboard in Resources */,
 				D0CAD9CF1AA8008C00D6605B /* LaunchScreen.xib in Resources */,
 				D0CAD9CC1AA8008C00D6605B /* Images.xcassets in Resources */,

@@ -30,7 +30,6 @@
 @interface QRCodeReaderView ()
 {
     __weak id<QRCodeReaderViewDelegate> delegate;
-    
     CGRect       innerViewRect;
     
 }

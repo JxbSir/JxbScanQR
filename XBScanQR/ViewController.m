@@ -36,17 +36,14 @@
 
 - (IBAction)scanAction:(id)sender
 {
-    static QRCodeReaderViewController *reader = nil;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        reader                        = [QRCodeReaderViewController new];
-        reader.modalPresentationStyle = UIModalPresentationFormSheet;
-    });
+    QRCodeReaderViewController *reader = [QRCodeReaderViewController new];\
+    reader.modalPresentationStyle = UIModalPresentationFormSheet;
     reader.delegate = self;
     
+    __weak typeof (self) wSelf = self;
     [reader setCompletionWithBlock:^(NSString *resultAsString) {
-        NSLog(@"Completion with result: %@", resultAsString);
+        [wSelf.navigationController popViewControllerAnimated:YES];
+        [[[UIAlertView alloc] initWithTitle:@"" message:resultAsString delegate:self cancelButtonTitle:@"好的" otherButtonTitles: nil] show];
     }];
     
     //[self presentViewController:reader animated:YES completion:NULL];
