@@ -14,6 +14,9 @@
 		D0CAD9CC1AA8008C00D6605B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0CAD9CB1AA8008C00D6605B /* Images.xcassets */; };
 		D0CAD9CF1AA8008C00D6605B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D0CAD9CD1AA8008C00D6605B /* LaunchScreen.xib */; };
 		D0CAD9DB1AA8008C00D6605B /* XBScanQRTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9DA1AA8008C00D6605B /* XBScanQRTests.m */; };
+		D0CAD9EC1AA8010200D6605B /* QRCameraSwitchButton.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9E61AA8010200D6605B /* QRCameraSwitchButton.m */; };
+		D0CAD9ED1AA8010200D6605B /* QRCodeReaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9E91AA8010200D6605B /* QRCodeReaderView.m */; };
+		D0CAD9EE1AA8010200D6605B /* QRCodeReaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0CAD9EB1AA8010200D6605B /* QRCodeReaderViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +43,13 @@
 		D0CAD9D41AA8008C00D6605B /* XBScanQRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XBScanQRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CAD9D91AA8008C00D6605B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D0CAD9DA1AA8008C00D6605B /* XBScanQRTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XBScanQRTests.m; sourceTree = "<group>"; };
+		D0CAD9E51AA8010200D6605B /* QRCameraSwitchButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCameraSwitchButton.h; sourceTree = "<group>"; };
+		D0CAD9E61AA8010200D6605B /* QRCameraSwitchButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCameraSwitchButton.m; sourceTree = "<group>"; };
+		D0CAD9E71AA8010200D6605B /* QRCodeReaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeReaderDelegate.h; sourceTree = "<group>"; };
+		D0CAD9E81AA8010200D6605B /* QRCodeReaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeReaderView.h; sourceTree = "<group>"; };
+		D0CAD9E91AA8010200D6605B /* QRCodeReaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeReaderView.m; sourceTree = "<group>"; };
+		D0CAD9EA1AA8010200D6605B /* QRCodeReaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeReaderViewController.h; sourceTree = "<group>"; };
+		D0CAD9EB1AA8010200D6605B /* QRCodeReaderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QRCodeReaderViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +73,7 @@
 		D0CAD9B21AA8008C00D6605B = {
 			isa = PBXGroup;
 			children = (
+				D0CAD9E41AA8010200D6605B /* QRCodeReaderViewController */,
 				D0CAD9BD1AA8008C00D6605B /* XBScanQR */,
 				D0CAD9D71AA8008C00D6605B /* XBScanQRTests */,
 				D0CAD9BC1AA8008C00D6605B /* Products */,
@@ -117,6 +128,20 @@
 				D0CAD9D91AA8008C00D6605B /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D0CAD9E41AA8010200D6605B /* QRCodeReaderViewController */ = {
+			isa = PBXGroup;
+			children = (
+				D0CAD9E51AA8010200D6605B /* QRCameraSwitchButton.h */,
+				D0CAD9E61AA8010200D6605B /* QRCameraSwitchButton.m */,
+				D0CAD9E71AA8010200D6605B /* QRCodeReaderDelegate.h */,
+				D0CAD9E81AA8010200D6605B /* QRCodeReaderView.h */,
+				D0CAD9E91AA8010200D6605B /* QRCodeReaderView.m */,
+				D0CAD9EA1AA8010200D6605B /* QRCodeReaderViewController.h */,
+				D0CAD9EB1AA8010200D6605B /* QRCodeReaderViewController.m */,
+			);
+			path = QRCodeReaderViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -220,8 +245,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0CAD9C71AA8008C00D6605B /* ViewController.m in Sources */,
+				D0CAD9EE1AA8010200D6605B /* QRCodeReaderViewController.m in Sources */,
 				D0CAD9C41AA8008C00D6605B /* AppDelegate.m in Sources */,
+				D0CAD9ED1AA8010200D6605B /* QRCodeReaderView.m in Sources */,
 				D0CAD9C11AA8008C00D6605B /* main.m in Sources */,
+				D0CAD9EC1AA8010200D6605B /* QRCameraSwitchButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +440,7 @@
 				D0CAD9E01AA8008C00D6605B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D0CAD9E11AA8008C00D6605B /* Build configuration list for PBXNativeTarget "XBScanQRTests" */ = {
 			isa = XCConfigurationList;
@@ -420,6 +449,7 @@
 				D0CAD9E31AA8008C00D6605B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

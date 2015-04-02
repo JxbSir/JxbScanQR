@@ -10,6 +10,6 @@
 
 @interface ViewController : UIViewController
 
-
+- (IBAction)scanAction:(id)sender;
 @end
 

@@ -28,10 +28,17 @@
 #import "QRCameraSwitchButton.h"
 #import "QRCodeReaderView.h"
 
-@interface QRCodeReaderViewController () <AVCaptureMetadataOutputObjectsDelegate>
+#define mainHeight     [[UIScreen mainScreen] bounds].size.height
+#define mainWidth      [[UIScreen mainScreen] bounds].size.width
+#define navBarHeight   self.navigationController.navigationBar.frame.size.height
+
+@interface QRCodeReaderViewController () <AVCaptureMetadataOutputObjectsDelegate,QRCodeReaderViewDelegate>
 @property (strong, nonatomic) QRCameraSwitchButton *switchCameraButton;
 @property (strong, nonatomic) QRCodeReaderView     *cameraView;
 @property (strong, nonatomic) UIButton             *cancelButton;
+@property (strong, nonatomic) UIImageView          *imgLine;
+@property (strong, nonatomic) UILabel              *lblTip;
+@property (strong, nonatomic) NSTimer              *timerScan;
 
 @property (strong, nonatomic) AVCaptureDevice            *defaultDevice;
 @property (strong, nonatomic) AVCaptureDeviceInput       *defaultDeviceInput;
@@ -49,22 +56,23 @@
 
 - (id)init
 {
-  return [self initWithCancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")];
+    return [self initWithCancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")];
 }
 
 - (id)initWithCancelButtonTitle:(NSString *)cancelTitle
 {
-  if ((self = [super init])) {
-    self.view.backgroundColor = [UIColor blackColor];
-    
-    [self setupAVComponents];
-    [self configureDefaultComponents];
-    [self setupUIComponentsWithCancelButtonTitle:cancelTitle];
-    [self setupAutoLayoutConstraints];
-    
-    [_cameraView.layer insertSublayer:self.previewLayer atIndex:0];
-  }
-  return self;
+    if ((self = [super init])) {
+        self.view.backgroundColor = [UIColor blackColor];
+
+        [self setupAVComponents];
+        [self configureDefaultComponents];
+        [self setupUIComponentsWithCancelButtonTitle:cancelTitle];
+        [self setupAutoLayoutConstraints];
+
+        [_cameraView.layer insertSublayer:self.previewLayer atIndex:0];
+        
+    }
+    return self;
 }
 
 + (instancetype)readerWithCancelButtonTitle:(NSString *)cancelTitle
@@ -72,17 +80,21 @@
   return [[self alloc] initWithCancelButtonTitle:cancelTitle];
 }
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
-  [super viewWillAppear:animated];
-  
-  [self startScanning];
+    [super viewWillAppear:animated];
+
+    [self startScanning];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
   [self stopScanning];
-  
   [super viewWillDisappear:animated];
 }
 
@@ -96,6 +108,20 @@
 - (BOOL)shouldAutorotate
 {
   return YES;
+}
+
+- (void)scanAnimate
+{
+    _imgLine.frame = CGRectMake(50, _cameraView.innerViewRect.origin.y, mainWidth - 100, 1);
+    [UIView animateWithDuration:2 animations:^{
+        _imgLine.frame = CGRectMake(_imgLine.frame.origin.x, _imgLine.frame.origin.y + _cameraView.innerViewRect.size.height, _imgLine.frame.size.width, _imgLine.frame.size.height);
+    }];
+}
+
+- (void)loadView:(CGRect)rect
+{
+    _imgLine.frame = CGRectMake(50, _cameraView.innerViewRect.origin.y, mainWidth - 100, 1);
+    [self scanAnimate];
 }
 
 #pragma mark - Managing the Orientation
@@ -136,24 +162,61 @@
 
 - (void)setupUIComponentsWithCancelButtonTitle:(NSString *)cancelButtonTitle
 {
-  self.cameraView                                       = [[QRCodeReaderView alloc] init];
-  _cameraView.translatesAutoresizingMaskIntoConstraints = NO;
-  _cameraView.clipsToBounds                             = YES;
-  [self.view addSubview:_cameraView];
-  
-  if (_frontDevice) {
-    _switchCameraButton = [[QRCameraSwitchButton alloc] init];
-    [_switchCameraButton setTranslatesAutoresizingMaskIntoConstraints:false];
-    [_switchCameraButton addTarget:self action:@selector(switchCameraAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:_switchCameraButton];
-  }
-  
-  self.cancelButton                                       = [[UIButton alloc] init];
-  _cancelButton.translatesAutoresizingMaskIntoConstraints = NO;
-  [_cancelButton setTitle:cancelButtonTitle forState:UIControlStateNormal];
-  [_cancelButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
-  [_cancelButton addTarget:self action:@selector(cancelAction:) forControlEvents:UIControlEventTouchUpInside];
-  [self.view addSubview:_cancelButton];
+    self.cameraView                                       = [[QRCodeReaderView alloc] init];
+    _cameraView.translatesAutoresizingMaskIntoConstraints = NO;
+    _cameraView.clipsToBounds                             = YES;
+    _cameraView.delegate                                  = self;
+    [self.view addSubview:_cameraView];
+
+    if (_frontDevice) {
+        _switchCameraButton = [[QRCameraSwitchButton alloc] init];
+        [_switchCameraButton setTranslatesAutoresizingMaskIntoConstraints:false];
+        [_switchCameraButton addTarget:self action:@selector(switchCameraAction:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:_switchCameraButton];
+    }
+
+    self.cancelButton                                       = [[UIButton alloc] init];
+    self.cancelButton.hidden                                = YES;
+    _cancelButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [_cancelButton setTitle:cancelButtonTitle forState:UIControlStateNormal];
+    [_cancelButton setTitleColor:[UIColor grayColor] forState:UIControlStateHighlighted];
+    [_cancelButton addTarget:self action:@selector(cancelAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_cancelButton];
+    
+    
+    
+    CGFloat c_width = mainWidth - 100;
+    CGFloat s_height = mainHeight - 40;
+    CGFloat y = (s_height - c_width) / 2 - s_height / 6;
+    
+    _lblTip = [[UILabel alloc] initWithFrame:CGRectMake(0,y + 90 + c_width, mainWidth, 15)];
+    _lblTip.text = @"将二维码放入框内 即可自动扫描";
+    _lblTip.textColor = [UIColor whiteColor];
+    _lblTip.font = [UIFont systemFontOfSize:13];
+    _lblTip.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:_lblTip];
+    
+    UIImageView* img1 = [[UIImageView alloc] initWithFrame:CGRectMake(30, y + 58, 48, 48)];
+    img1.image = [UIImage imageNamed:@"cor1"];
+    [self.view addSubview:img1];
+    
+    UIImageView* img2 = [[UIImageView alloc] initWithFrame:CGRectMake(22 + c_width, y + 58, 48, 48)];
+    img2.image = [UIImage imageNamed:@"cor2"];
+    [self.view addSubview:img2];
+    
+    UIImageView* img3 = [[UIImageView alloc] initWithFrame:CGRectMake(35, y + c_width + 51, 48, 48)];
+    img3.image = [UIImage imageNamed:@"cor3"];
+    [self.view addSubview:img3];
+    
+    UIImageView* img4 = [[UIImageView alloc] initWithFrame:CGRectMake(22 + c_width, y + c_width + 51, 48, 48)];
+    img4.image = [UIImage imageNamed:@"cor4"];
+    [self.view addSubview:img4];
+    
+    
+    _imgLine = [[UIImageView alloc] init];
+    _imgLine.backgroundColor = [UIColor greenColor];
+    _imgLine.layer.cornerRadius = 3;
+    [self.view addSubview:_imgLine];
 }
 
 - (void)setupAutoLayoutConstraints
@@ -161,7 +224,7 @@
   NSDictionary *views = NSDictionaryOfVariableBindings(_cameraView, _cancelButton);
   
   [self.view addConstraints:
-   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cameraView][_cancelButton(40)]|" options:0 metrics:nil views:views]];
+   [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cameraView][_cancelButton(0)]|" options:0 metrics:nil views:views]];
   [self.view addConstraints:
    [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_cameraView]|" options:0 metrics:nil views:views]];
   [self.view addConstraints:
@@ -258,16 +321,29 @@
 
 - (void)startScanning;
 {
-  if (![self.session isRunning]) {
-    [self.session startRunning];
-  }
+    if (![self.session isRunning]) {
+        [self.session startRunning];
+    }
+    
+    if(_timerScan)
+    {
+        [_timerScan invalidate];
+        _timerScan = nil;
+    }
+    
+    _timerScan = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(scanAnimate) userInfo:nil repeats:YES];
 }
 
 - (void)stopScanning;
 {
-  if ([self.session isRunning]) {
-    [self.session stopRunning];
-  }
+    if ([self.session isRunning]) {
+        [self.session stopRunning];
+    }
+    if(_timerScan)
+    {
+        [_timerScan invalidate];
+        _timerScan = nil;
+    }
 }
 
 #pragma mark - AVCaptureMetadataOutputObjects Delegate Methods
