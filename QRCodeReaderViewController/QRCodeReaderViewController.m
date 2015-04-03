@@ -117,15 +117,15 @@
 
 - (void)scanAnimate
 {
-    _imgLine.frame = CGRectMake(50, _cameraView.innerViewRect.origin.y, mainWidth - 100, 1);
+    _imgLine.frame = CGRectMake(0, _cameraView.innerViewRect.origin.y, mainWidth, 12);
     [UIView animateWithDuration:2 animations:^{
-        _imgLine.frame = CGRectMake(_imgLine.frame.origin.x, _imgLine.frame.origin.y + _cameraView.innerViewRect.size.height, _imgLine.frame.size.width, _imgLine.frame.size.height);
+        _imgLine.frame = CGRectMake(_imgLine.frame.origin.x, _imgLine.frame.origin.y + _cameraView.innerViewRect.size.height - 6, _imgLine.frame.size.width, _imgLine.frame.size.height);
     }];
 }
 
 - (void)loadView:(CGRect)rect
 {
-    _imgLine.frame = CGRectMake(50, _cameraView.innerViewRect.origin.y, mainWidth - 100, 1);
+    _imgLine.frame = CGRectMake(0, _cameraView.innerViewRect.origin.y, mainWidth, 12);
     [self scanAnimate];
 }
 
@@ -201,26 +201,27 @@
     _lblTip.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:_lblTip];
     
-    UIImageView* img1 = [[UIImageView alloc] initWithFrame:CGRectMake(30, y + 58, 48, 48)];
+    CGFloat corWidth = 16;
+    
+    UIImageView* img1 = [[UIImageView alloc] initWithFrame:CGRectMake(49, y + 76, corWidth, corWidth)];
     img1.image = [UIImage imageNamed:@"cor1"];
     [self.view addSubview:img1];
     
-    UIImageView* img2 = [[UIImageView alloc] initWithFrame:CGRectMake(22 + c_width, y + 58, 48, 48)];
+    UIImageView* img2 = [[UIImageView alloc] initWithFrame:CGRectMake(35 + c_width, y + 76, corWidth, corWidth)];
     img2.image = [UIImage imageNamed:@"cor2"];
     [self.view addSubview:img2];
     
-    UIImageView* img3 = [[UIImageView alloc] initWithFrame:CGRectMake(35, y + c_width + 51, 48, 48)];
+    UIImageView* img3 = [[UIImageView alloc] initWithFrame:CGRectMake(49, y + c_width + 64, corWidth, corWidth)];
     img3.image = [UIImage imageNamed:@"cor3"];
     [self.view addSubview:img3];
     
-    UIImageView* img4 = [[UIImageView alloc] initWithFrame:CGRectMake(22 + c_width, y + c_width + 51, 48, 48)];
+    UIImageView* img4 = [[UIImageView alloc] initWithFrame:CGRectMake(35 + c_width, y + c_width + 64, corWidth, corWidth)];
     img4.image = [UIImage imageNamed:@"cor4"];
     [self.view addSubview:img4];
     
     
     _imgLine = [[UIImageView alloc] init];
-    _imgLine.backgroundColor = [UIColor greenColor];
-    _imgLine.layer.cornerRadius = 3;
+    _imgLine.image = [UIImage imageNamed:@"QRCodeScanLine"];
     [self.view addSubview:_imgLine];
 }
 
