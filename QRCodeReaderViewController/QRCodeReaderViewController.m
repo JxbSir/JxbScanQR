@@ -32,7 +32,7 @@
 #define mainWidth      [[UIScreen mainScreen] bounds].size.width
 #define navBarHeight   self.navigationController.navigationBar.frame.size.height
 
-@interface QRCodeReaderViewController () <AVCaptureMetadataOutputObjectsDelegate,QRCodeReaderViewDelegate>
+@interface QRCodeReaderViewController () <AVCaptureMetadataOutputObjectsDelegate,QRCodeReaderViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 @property (strong, nonatomic) QRCameraSwitchButton *switchCameraButton;
 @property (strong, nonatomic) QRCodeReaderView     *cameraView;
 @property (strong, nonatomic) AVAudioPlayer        *beepPlayer;
@@ -48,6 +48,8 @@
 @property (strong, nonatomic) AVCaptureMetadataOutput    *metadataOutput;
 @property (strong, nonatomic) AVCaptureSession           *session;
 @property (strong, nonatomic) AVCaptureVideoPreviewLayer *previewLayer;
+
+@property (strong, nonatomic) CIDetector *detector;
 
 @property (copy, nonatomic) void (^completionBlock) (NSString *);
 
@@ -88,6 +90,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"相册" style:UIBarButtonItemStylePlain target:self action:@selector(clickRightBarButton:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -284,7 +288,9 @@
   [_previewLayer setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
   
   if ([_previewLayer.connection isVideoOrientationSupported]) {
-    _previewLayer.connection.videoOrientation = [[self class] videoOrientationFromInterfaceOrientation:self.interfaceOrientation];
+    
+      _previewLayer.connection.videoOrientation = [[self class] videoOrientationFromInterfaceOrientation:self.interfaceOrientation];
+    
   }
 }
 
@@ -406,4 +412,40 @@
   }
 }
 
+#pragma mark - Checking RightBarButtonItem
+-(void)clickRightBarButton:(UIBarButtonItem*)item
+{
+    self.detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{ CIDetectorAccuracy : CIDetectorAccuracyHigh }];
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = NO;
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    [self.navigationController presentViewController:picker animated:YES completion:nil];
+}
+
+#pragma mark - UIImagePickerControllerDelegate
+- ( void )imagePickerController:( UIImagePickerController *)picker didFinishPickingMediaWithInfo:( NSDictionary *)info
+{
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+    if (!image){
+        image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    }
+    
+    //    NSArray *features = [self.detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]
+    //                                               options:@{CIDetectorImageOrientation:[NSNumber numberWithInt:1]}];
+    NSArray *features = [self.detector featuresInImage:[CIImage imageWithCGImage:image.CGImage]];
+    if (features.count >=1) {
+        CIQRCodeFeature *feature = [features objectAtIndex:0];
+        NSString *scannedResult = feature.messageString;
+        if (_completionBlock) {
+            [_beepPlayer play];
+            _completionBlock(scannedResult);
+        }
+        
+        if (_delegate && [_delegate respondsToSelector:@selector(reader:didScanResult:)]) {
+            [_delegate reader:self didScanResult:scannedResult];
+        }
+    }
+}
 @end
